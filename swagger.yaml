@@ -1,0 +1,213 @@
+openapi: 3.0.0
+info:
+  title: API de Produtos
+  description: CRUD completo de produtos
+  version: 1.0.0
+servers:
+  - url: https://devweb-tw2l.onrender.com
+paths:
+  /:
+    get:
+      summary: Listar todos os produtos
+      operationId: listarProdutos
+      responses:
+        '200':
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      summary: Criar novo produto
+      operationId: criarProduto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdutoInput'
+      responses:
+        '201':
+          description: Produto cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '422':
+          description: Falta de campos obrigatórios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /{filtro}:
+    get:
+      summary: Obter produto por ID ou nome
+      operationId: obterProduto
+      parameters:
+        - name: filtro
+          in: path
+          description: ID do produto ou nome exato
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+        '404':
+          description: Produto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /{id}:
+    put:
+      summary: Atualizar produto
+      operationId: atualizarProduto
+      parameters:
+        - name: id
+          in: path
+          description: ID do produto
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdutoInput'
+      responses:
+        '200':
+          description: Produto atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Produto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      summary: Deletar produto
+      operationId: deletarProduto
+      parameters:
+        - name: id
+          in: path
+          description: ID do produto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produto deletado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Produto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    Produto:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 60d0fe4f5311236168a109ca
+        nome:
+          type: string
+          example: Celular Android
+        descricao:
+          type: string
+          example: Modelo intermediário com 128GB
+        cor:
+          type: string
+          example: Preto
+        peso:
+          type: number
+          format: float
+          example: 0.4
+        tipo:
+          type: string
+          example: Eletrônico
+        preco:
+          type: number
+          format: double
+          example: 1299.90
+        dataCadastro:
+          type: string
+          format: date-time
+          example: 2025-06-22T21:20:09.804Z
+
+    ProdutoInput:
+      type: object
+      required:
+        - nome
+        - descricao
+        - cor
+        - peso
+        - tipo
+        - preco
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        cor:
+          type: string
+        peso:
+          type: number
+          format: float
+        tipo:
+          type: string
+        preco:
+          type: number
+          format: double
+
+    SuccessMessage:
+      type: object
+      properties:
+        mensagem:
+          type: string
+          example: Produto cadastrado com sucesso!
+
+    ErrorMessage:
+      type: object
+      properties:
+        erro:
+          type: string
+          example: Preencha todos os campos obrigatórios!
+
+  responses:
+    ServerError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
